@@ -2,6 +2,7 @@ package main
 
 import (
 	// "flag"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,7 @@ import (
 * TODO reverse
 
 * TODO fs
+	* ? functionality works with shadow and standard but not with thinkertoy
 
 * TODO color
 
@@ -19,7 +21,7 @@ import (
 
 * TODO align
 
- */
+*/
 
 // removeEmptyStrings - Use this to remove empty string values inside an array.
 func removeEmptyStrings(s []string) []string {
@@ -64,9 +66,11 @@ func PrintAscii() {
 }
 
 func main() {
-	// reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
-	// color := flag.Bool("color", false, "Tell the program to run the color function")
-	// output := flag.Bool("output", false, "Tell the program to run the output function")
-	// align := flag.Bool("align", false, "Tell the program to run the align function")
+	// ? flag definitions
+	reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
+	color := flag.Bool("color", false, "Tell the program to run the color function")
+	output := flag.Bool("output", false, "Tell the program to run the output function")
+	align := flag.Bool("align", false, "Tell the program to run the align function")
+	flag.Parse()
 	PrintAscii()
 }
