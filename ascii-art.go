@@ -1,46 +1,26 @@
 package main
 
 import (
+	// "flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 )
 
-/*
+/**
+* TODO reverse
 
-strings:
---------
-hello
-HELLO
-HeLlo HuMaN
-1Hello 2There
-Hello\nThere
-Hello\n\nThere
-{Hello & There #}
-hello There 1 to 2!
-MaD3IrA&LiSboN
-1a\"#FdwHywR&/()=
-{|}~
-[\]^_ 'a
-RGB
-:;<=>?@
-\!" #$%&'"'"'()*+,-./
-ABCDEFGHIJKLMNOPQRSTUVWXYZ
-abcdefghijklmnopqrstuvwxyz
-<a random string> with at least four lower case letters and three upper case letters.
-<a random string> with at least five lower case letters, a space and two numbers.
-<a random string> with at least one upper case letters and 3 special characters.
-<a random string> with at least two lower case letters, two spaces, one number, two special characters and three upper case letters.
+* TODO fs
 
-+Does the project run quickly and effectively? (Favoring recursive, no unnecessary data requests, etc)
-+Does the code obey the good practices?
-+Is there a test file for this code?
-+Are the tests checking each possible case?
-+Is the output of the program well structured? Are the characters displayed correctly in line?
-https://github.com/01-edu/public/blob/master/subjects/ascii-art/audit/README.md
+* TODO color
 
-*/
+* TODO output
+
+* TODO align
+
+ */
+
 // removeEmptyStrings - Use this to remove empty string values inside an array.
 func removeEmptyStrings(s []string) []string {
 	var r []string
@@ -52,28 +32,41 @@ func removeEmptyStrings(s []string) []string {
 	return r
 }
 
-func main() {
+func PrepareInputs() ([]string, []string) {
 	// save argument as a variable
 	text := os.Args[1]
+	style := "standard"
+	if len(os.Args) == 3 {
+		style = os.Args[2]
+	}
 	textarr := strings.Split(text, "\\n")
 	// import file of target ascii
-	file, err := os.ReadFile("standard.txt")
+	file, err := os.ReadFile("ascii_styles/" + style + ".txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// zero the ascii code to provide a baseline
-	baseline := 32
 	// assign this to a variable, split by endlines
 	source := strings.Split(string(file), "\n")
-
 	textarr = removeEmptyStrings(textarr)
+	return source, textarr
+}
 
+func PrintAscii() {
+	source, textarr := PrepareInputs()
 	for i := 0; i < len(textarr); i++ {
 		for j := 1; j < 10; j++ {
 			for _, char := range textarr[i] {
-				fmt.Print(source[(int(char)-(baseline))*9+(j)])
+				fmt.Print(source[(int(char)-(32))*9+(j)])
 			}
 			fmt.Println("")
 		}
 	}
+}
+
+func main() {
+	// reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
+	// color := flag.Bool("color", false, "Tell the program to run the color function")
+	// output := flag.Bool("output", false, "Tell the program to run the output function")
+	// align := flag.Bool("align", false, "Tell the program to run the align function")
+	PrintAscii()
 }
