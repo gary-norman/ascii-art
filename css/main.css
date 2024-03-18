@@ -1,0 +1,217 @@
+:root {
+  --main-bg-grad: linear-gradient(155deg, rgb(14 6 42), rgb(1, 52, 37));
+  --main-bg-clr: rgb(14, 6, 42);
+  --card-bg: rgb(124, 124, 124);
+  --accent: rgb(0, 128, 92);
+  --text-clr: rgb(231, 237, 241);
+  --text-clr-dark: rgb(0 0 0 / 0.8);
+  --border-rad: 0.3rem;
+  --box-shadow: 0 0.25 1rem rgb(0 0 0 / .5);
+  /* fonts */
+  --font-sz-main: clamp(0.8rem, 0.6rem + 0.65vw, 1.5rem);
+  --font-sz-cards: clamp(0.8rem, 0.2rem + 0.65vw, 1rem);
+  --font-primary: 'Roboto', sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+  --font-accent: 'Kdam Thmor Pro', sans-serif;
+  
+  /* motion color racing */
+  --mcr-yellow: rgb(226, 192, 68);
+  --mcr-blue: rgb(31, 32, 65);
+  --mcr-cyan: rgb(81, 163, 163);
+  --mcr-red: rgb(159, 52, 45);
+  --mcr-grad: linear-gradient(50deg, var(--mcr-red), var(--mcr-yellow), var(--mcr-cyan), var(--mcr-blue));
+}
+
+body {
+  width: 85%;
+  margin: 0 auto;
+  background: var(--main-bg-grad);
+  background-attachment: fixed;
+  color: var(--text-clr) ;
+  font-family: var(--font-primary);
+  font-size: var(--font-sz-main);
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: .5fr 1fr 3.5fr 1fr .5fr;
+  grid-template-rows: 1fr 1fr 7fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . ."
+    ". . . . ."
+    ". . . . ."
+    ". . . . .";
+}
+
+.frosted {
+  grid-column: 2 / 5;
+  grid-row: 2 / 4;
+  color: rgba(128, 128, 128, 0.738);
+}
+
+a {
+  text-decoration: none!important;
+  color: var(--text-clr)
+}
+
+main {
+  display: flex;
+  background: var(--mcr-grad);
+  /* background-attachment: fixed; */
+  margin: 0.5rem 0 0 0;
+  padding: 1rem;
+  border-radius: var(--border-rad);
+}
+.portfolio__header {
+  background-color: var(--mcr-yellow);
+  background-image: linear-gradient(90deg, var(--mcr-yellow) 60%, var(--mcr-red) 100%);
+  margin: 0.8rem 0;
+  padding: 0.5rem;
+  border-radius: var(--border-rad);
+}
+
+.portfolio__header h2 {
+  margin: 0;
+  font-family: var(--font-accent);
+  text-align: right;
+}
+
+.portfolio-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.about {
+  width: 90%;
+  display: grid; 
+  grid-template-columns: 1fr 2fr 4fr 1fr; 
+  grid-template-rows: 0.5fr 1.5fr 7fr; 
+  gap: 2px 0px; 
+  grid-template-areas: 
+    ". a a ."
+    ". b c ."
+    ". d d .";
+  background: rgb(0 0 0 / .2);
+  padding: 1rem;
+  border-radius: var(--border-rad);
+  justify-items: center;
+}
+
+.about h1 {
+  grid-area: a;
+  align-self: center;
+}
+
+.radios {
+  grid-area: b;
+  align-self: center;
+}
+
+.input {
+  grid-area: c;
+  align-self: center;
+}
+#text_input {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.ascii {
+  grid-area: d;
+  align-self: start;
+}
+.ascii p {
+  justify-self: start;
+}
+
+@media only screen and (max-width: 500px) {
+  .wrapper {
+      height: 100dvh;
+      overflow-y: scroll;
+      overscroll-behavior-y: contain;
+      scroll-snap-type: y mandatory;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+  .wrapper::-webkit-scrollbar {
+      display: none;
+  }
+  .frontpage {
+      height: 100%;
+      scroll-snap-align: start;
+  }
+  main {
+      flex-direction: column;
+      height: 95%;
+      width: 90%;
+      position: relative;
+      top: 50%;
+    transform: translateY(-50%);
+      margin: auto;
+  }
+  .scroll {
+      top: 22%;
+  }
+  .portfolio {
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-align: start;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+  .portfolio::-webkit-scrollbar {
+      display: none;
+  }
+  .footer {
+      padding: 0;
+  }
+}
+
+@media only screen and (min-width: 501px)  {
+  .wrapper {
+      height: 100dvh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+  .wrapper::-webkit-scrollbar {
+      display: none;
+  }
+  .frontpage {
+      height: 100%;
+      scroll-snap-align: start;
+  }
+  main {
+      height: 90%;
+      width: 90%;
+      position: relative;
+      top: 50%;
+    transform: translateY(-50%);
+      margin: auto;
+  }
+  .portfolio {
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-align: start;
+      margin-top: 1rem;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+  }
+  .portfolio::-webkit-scrollbar {
+      display: none;
+  }
+}
+
+@media only screen and (min-width: 1080px) {
+  .about {
+      margin-left: 2.5rem;
+  } 
+}
