@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	// "regexp"
 	"strings"
 )
 
@@ -17,22 +19,11 @@ import (
 
 * TODO color
 
-* TODO output
+* ^^ output
 
 * TODO align
 
 */
-
-// removeEmptyStrings - Use this to remove empty string values inside an array.
-func removeEmptyStrings(s []string) []string {
-	var r []string
-	for _, str := range s {
-		if str != "" {
-			r = append(r, str)
-		}
-	}
-	return r
-}
 
 // import standard.txt as the default ascii style, with ability to change it
 // using 2nd argument *
@@ -56,29 +47,28 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
-// save the first argument as an array equal in size to the wordcount
-func prepareArg() []string {
-	text := os.Args[1]
-	textarr := strings.Split(text, "\\n")
-	textarr = removeEmptyStrings(textarr)
-	return textarr
-}
+// // save the first argument as an array equal in size to the wordcount
+// func prepareArg(text string) []string {
+// 	textarr := strings.Split(text, "\\n")
+// 	textarr = removeEmptyStrings(textarr)
+// 	return textarr
+// }
 
-func PrintAscii(bannerStyle string) {
-	if len(os.Args) > 3 {
-		fmt.Println("Usage: go run . [STRING] [BANNER]\n\nEX: go run . something standard")
-		return
-	}
-	source, textarr := PrepareBan(bannerStyle), prepareArg()
-	for i := 0; i < len(textarr); i++ {
-		for j := 1; j < 10; j++ {
-			for _, char := range textarr[i] {
-				fmt.Print(source[(int(char)-(32))*9+(j)])
-			}
-			fmt.Println("")
-		}
-	}
-}
+// func PrintAscii(bannerStyle string) {
+// 	if len(os.Args) > 3 {
+// 		fmt.Println("Usage: go run . [STRING] [BANNER]\n\nEX: go run . something standard")
+// 		return
+// 	}
+// 	source, textarr := PrepareBan(bannerStyle), prepareArg()
+// 	for i := 0; i < len(textarr); i++ {
+// 		for j := 1; j < 10; j++ {
+// 			for _, char := range textarr[i] {
+// 				fmt.Print(source[(int(char)-(32))*9+(j)])
+// 			}
+// 			fmt.Println("")
+// 		}
+// 	}
+// }
 
 func getChars(source []string) map[int][]string {
 	charMap := make(map[int][]string)
@@ -112,18 +102,19 @@ func makeArt(origString string, y map[int][]string) string {
 }
 
 func main() {
-	fileOutput := "filename.txt"
-	input := os.Args[1]
-	var bannerStyle string
-	if len(os.Args) == 3 {
-		bannerStyle = os.Args[2]
-	}
+
 	// ? flag definitions
 	reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
 	color := flag.Bool("color", false, "Tell the program to run the color function")
-	output := flag.Bool("output", false, "Tell the program to run the output function")
+	output := flag.String("output", "default", "Save the output to the specified filename")
 	align := flag.Bool("align", false, "Tell the program to run the align function")
 	flag.Parse()
+	additionalArgs := flag.Args()
+	input := additionalArgs[0]
+	var bannerStyle string
+	if len(additionalArgs) == 2 {
+		bannerStyle = additionalArgs[1]
+	}
 	if *reverse {
 		fmt.Printf("Reverse flag is set to  %t\n", *reverse)
 		return
@@ -132,8 +123,13 @@ func main() {
 		fmt.Printf("color flag is set to  %t\n", *color)
 		return
 	}
-	if *output {
-
+	if *output != "default" {
+		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
+		fmt.Printf("Output has been saved to %v\n", *output)
 		return
 	}
 	if *align {
