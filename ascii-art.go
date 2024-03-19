@@ -133,8 +133,7 @@ func main() {
 		return
 	}
 	if *output {
-		err := os.WriteFile(fileOutput, string(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
-		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
+
 		return
 	}
 	if *align {
