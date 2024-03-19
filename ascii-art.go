@@ -47,29 +47,6 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
-// // save the first argument as an array equal in size to the wordcount
-// func prepareArg(text string) []string {
-// 	textarr := strings.Split(text, "\\n")
-// 	textarr = removeEmptyStrings(textarr)
-// 	return textarr
-// }
-
-// func PrintAscii(bannerStyle string) {
-// 	if len(os.Args) > 3 {
-// 		fmt.Println("Usage: go run . [STRING] [BANNER]\n\nEX: go run . something standard")
-// 		return
-// 	}
-// 	source, textarr := PrepareBan(bannerStyle), prepareArg()
-// 	for i := 0; i < len(textarr); i++ {
-// 		for j := 1; j < 10; j++ {
-// 			for _, char := range textarr[i] {
-// 				fmt.Print(source[(int(char)-(32))*9+(j)])
-// 			}
-// 			fmt.Println("")
-// 		}
-// 	}
-// }
-
 func getChars(source []string) map[int][]string {
 	charMap := make(map[int][]string)
 	id := 31
@@ -101,13 +78,63 @@ func makeArt(origString string, y map[int][]string) string {
 	return art
 }
 
+// Contains checks if a slice contains a specific element.
+func Contains(slice []rune, item rune) bool {
+	for _, v := range slice {
+		if v == item {
+			return true // Found the item
+		}
+	}
+	return false // Item not found
+}
+
+// transform the input text origString to the output art, line by line, colorizing specified text
+func makeArtColorized(origString string, y map[int][]string, letters []rune, color string, colorAll bool) string {
+	var specifiedColor string
+	switch color {
+	case "red":
+		specifiedColor = "\033[31m"
+	case "green":
+		specifiedColor = "\033[32m"
+	case "yellow":
+		specifiedColor = "\033[33m"
+	case "blue":
+		specifiedColor = "\033[34m"
+	}
+	reset := "\033[0m"
+	var art string
+	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
+	wordSlice := strings.Split(replaceNewline, "\\n")
+	for _, word := range wordSlice {
+		for j := 0; j < len(y[32]); j++ {
+			var line string
+			if colorAll {
+				for _, letter := range word {
+					line = specifiedColor + line + string((y[int(letter)][j]))
+				}
+			} else {
+				for _, letter := range word {
+					if Contains(letters, letter) {
+						line = line + specifiedColor + string((y[int(letter)][j])) + reset
+					} else {
+						line = line + string((y[int(letter)][j]))
+					}
+				}
+			}
+			art += line + "\n" + reset
+			line = ""
+		}
+	}
+	return art
+}
+
 func main() {
 
 	// ? flag definitions
-	reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
-	color := flag.Bool("color", false, "Tell the program to run the color function")
+	reverse := flag.String("reverse", "default", "Tell the program to run the reverse function")
+	color := flag.String("color", "default", "Tell the program to run the color function")
 	output := flag.String("output", "default", "Save the output to the specified filename")
-	align := flag.Bool("align", false, "Tell the program to run the align function")
+	align := flag.String("align", "default", "Tell the program to run the align function")
 	flag.Parse()
 	additionalArgs := flag.Args()
 	input := additionalArgs[0]
@@ -115,12 +142,23 @@ func main() {
 	if len(additionalArgs) == 2 {
 		bannerStyle = additionalArgs[1]
 	}
-	if *reverse {
-		fmt.Printf("Reverse flag is set to  %t\n", *reverse)
+	if *reverse != "default" {
+		fmt.Printf("Reverse flag is set to  %v\n", *reverse)
 		return
 	}
-	if *color {
-		fmt.Printf("color flag is set to  %t\n", *color)
+	if *color != "default" {
+		var colored string
+		var colorAll bool
+		var colSLice []rune
+		colorAll = true
+		if len(additionalArgs) == 2 {
+			colorAll = false
+			colored = additionalArgs[0]
+			colSLice = []rune(colored)
+			input = additionalArgs[1]
+		}
+		fmt.Println(makeArtColorized(input, getChars(PrepareBan("")), colSLice, *color, colorAll))
+		fmt.Printf("color flag is set to  %v\n", *color)
 		return
 	}
 	if *output != "default" {
@@ -132,8 +170,9 @@ func main() {
 		fmt.Printf("Output has been saved to %v\n", *output)
 		return
 	}
-	if *align {
-		fmt.Printf("align flag is set to  %t\n", *align)
+	if *align != "default" {
+		fmt.Printf("align flag is set to  %v\n", *align)
+		return
 	} else {
 		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
 	}
