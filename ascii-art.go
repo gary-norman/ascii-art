@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "flag"
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -35,20 +35,27 @@ func removeEmptyStrings(s []string) []string {
 }
 
 func PrepareInputs() ([]string, []string) {
-	// save argument as a variable
-	text := os.Args[1]
+	// import standard.txt as the default ascii style, with ability to change it
+	// using 2nd argument *
+	// ^^ thinkertoy does not work
 	style := "standard"
 	if len(os.Args) == 3 {
 		style = os.Args[2]
 	}
-	textarr := strings.Split(text, "\\n")
-	// import file of target ascii
-	file, err := os.ReadFile("ascii_styles/" + style + ".txt")
+	file, err := os.Open("ascii_styles/" + style + ".txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// assign this to a variable, split by endlines
-	source := strings.Split(string(file), "\n")
+	scanned := bufio.NewScanner(file)
+	scanned.Split(bufio.ScanLines)
+	var source []string
+	for scanned.Scan() {
+		source = append(source, scanned.Text())
+	}
+	file.Close()
+	// save the first argument as an array equal in size to the wordcount
+	text := os.Args[1]
+	textarr := strings.Split(text, "\\n")
 	textarr = removeEmptyStrings(textarr)
 	return source, textarr
 }
@@ -67,10 +74,27 @@ func PrintAscii() {
 
 func main() {
 	// ? flag definitions
-	reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
-	color := flag.Bool("color", false, "Tell the program to run the color function")
-	output := flag.Bool("output", false, "Tell the program to run the output function")
-	align := flag.Bool("align", false, "Tell the program to run the align function")
+	var reverse bool
+	flag.BoolVar(&reverse, "reverse", false, "Tell the program to run the reverse function")
+	var color bool
+	flag.BoolVar(&color, "color", false, "Tell the program to run the color function")
+	var output bool
+	flag.BoolVar(&output, "output", false, "Tell the program to run the output function")
+	var align bool
+	flag.BoolVar(&align, "align", false, "Tell the program to run the align function")
 	flag.Parse()
-	PrintAscii()
+	if reverse {
+		print("reverse")
+	}
+	if color {
+		print("color")
+	}
+	if output {
+		print("output")
+	}
+	if align {
+		print("align")
+	} else {
+		PrintAscii()
+	}
 }
