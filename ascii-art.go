@@ -17,7 +17,7 @@ import (
 * ^^ fs
 	* ^^ SOLVED functionality works with shadow and standard but not with thinkertoy
 
-* TODO color
+* ^^ color
 
 * ^^ output
 
@@ -158,7 +158,6 @@ func main() {
 			input = additionalArgs[1]
 		}
 		fmt.Println(makeArtColorized(input, getChars(PrepareBan("")), colSLice, *color, colorAll))
-		fmt.Printf("color flag is set to  %v\n", *color)
 		return
 	}
 	if *output != "default" {
