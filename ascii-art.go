@@ -34,7 +34,7 @@ func removeEmptyStrings(s []string) []string {
 	return r
 }
 
-func PrepareInputs() ([]string, []string) {
+func PrepareBan() []string {
 	// import standard.txt as the default ascii style, with ability to change it
 	// using 2nd argument *
 	// ^^ thinkertoy does not work
@@ -53,11 +53,15 @@ func PrepareInputs() ([]string, []string) {
 		source = append(source, scanned.Text())
 	}
 	file.Close()
+	return source
+}
+
+func prepareArg() []string {
 	// save the first argument as an array equal in size to the wordcount
 	text := os.Args[1]
 	textarr := strings.Split(text, "\\n")
 	textarr = removeEmptyStrings(textarr)
-	return source, textarr
+	return textarr
 }
 
 func PrintAscii() {
@@ -65,7 +69,7 @@ func PrintAscii() {
 		fmt.Println("Usage: go run . [STRING] [BANNER]\n\nEX: go run . something standard")
 		return
 	}
-	source, textarr := PrepareInputs()
+	source, textarr := PrepareBan(), prepareArg()
 	for i := 0; i < len(textarr); i++ {
 		for j := 1; j < 10; j++ {
 			for _, char := range textarr[i] {
