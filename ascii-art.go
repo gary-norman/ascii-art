@@ -12,8 +12,8 @@ import (
 /**
 * TODO reverse
 
-* TODO fs
-	* ? functionality works with shadow and standard but not with thinkertoy
+* ^^ fs
+	* ^^ SOLVED functionality works with shadow and standard but not with thinkertoy
 
 * TODO color
 
@@ -61,6 +61,10 @@ func PrepareInputs() ([]string, []string) {
 }
 
 func PrintAscii() {
+	if len(os.Args) > 3 {
+		fmt.Println("Usage: go run . [STRING] [BANNER]\n\nEX: go run . something standard")
+		return
+	}
 	source, textarr := PrepareInputs()
 	for i := 0; i < len(textarr); i++ {
 		for j := 1; j < 10; j++ {
@@ -74,26 +78,25 @@ func PrintAscii() {
 
 func main() {
 	// ? flag definitions
-	var reverse bool
-	flag.BoolVar(&reverse, "reverse", false, "Tell the program to run the reverse function")
-	var color bool
-	flag.BoolVar(&color, "color", false, "Tell the program to run the color function")
-	var output bool
-	flag.BoolVar(&output, "output", false, "Tell the program to run the output function")
-	var align bool
-	flag.BoolVar(&align, "align", false, "Tell the program to run the align function")
+	reverse := flag.Bool("reverse", false, "Tell the program to run the reverse function")
+	color := flag.Bool("color", false, "Tell the program to run the color function")
+	output := flag.Bool("output", false, "Tell the program to run the output function")
+	align := flag.Bool("align", false, "Tell the program to run the align function")
 	flag.Parse()
-	if reverse {
-		print("reverse")
+	if *reverse {
+		fmt.Printf("Reverse flag is set to  %t\n", *reverse)
+		return
 	}
-	if color {
-		print("color")
+	if *color {
+		fmt.Printf("color flag is set to  %t\n", *color)
+		return
 	}
-	if output {
-		print("output")
+	if *output {
+		fmt.Printf("output flag is set to  %t\n", *output)
+		return
 	}
-	if align {
-		print("align")
+	if *align {
+		fmt.Printf("align flag is set to  %t\n", *align)
 	} else {
 		PrintAscii()
 	}
