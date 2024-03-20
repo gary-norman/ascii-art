@@ -170,7 +170,7 @@ func main() {
 		var colorAll bool
 		var colSLice []rune
 		colorAll = true
-		if len(additionalArgs) == 3 {
+		if len(additionalArgs) > 2 {
 			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> \"something\"")
 		}
 		if len(additionalArgs) == 2 {
@@ -183,7 +183,9 @@ func main() {
 		return
 	}
 	if *output != "default" {
-		// TODO add error/instruction message
+		if len(additionalArgs) > 2 {
+			fmt.Println("Usage: go run . [OPTION] [STRING] [STYLE]\n\nEX: go run . --output=<filename> \"something\" shadow.")
+		}
 		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
 		if err != nil {
 			log.Fatal(err)
@@ -197,7 +199,9 @@ func main() {
 		fmt.Printf("align flag is set to  %v\n", *align)
 		return
 	} else {
-		// TODO add error/instruction message
+		if len(additionalArgs) > 2 {
+			fmt.Println("Usage: go run . [STRING] [STYLE] (optional)\n\nEX: go run . \"something\" thinkertoy.\nAvailable styles are standard, shadow, and thinkertoy.")
+		}
 		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
 	}
 }
