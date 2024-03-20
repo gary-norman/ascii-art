@@ -170,7 +170,9 @@ func main() {
 		var colorAll bool
 		var colSLice []rune
 		colorAll = true
-		// TODO add error/instruction message
+		if len(additionalArgs) == 3 {
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> \"something\"")
+		}
 		if len(additionalArgs) == 2 {
 			colorAll = false
 			colored = additionalArgs[0]
