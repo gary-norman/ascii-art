@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	// "regexp"
 	"strings"
@@ -135,13 +136,17 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 
 func main() {
 	// ? flag definitions
-	reverse := flag.String("reverse", "default", "Tell the program to run the reverse function")
-	color := flag.String("color", "default", "Tell the program to run the color function")
+	reverse := flag.String("reverse", "default", "Convert ascii art from a specified file into a string of characters.")
+	color := flag.String("color", "default", "Format the output into a specified colour, either the entire text, or limited to specified characters.")
 	output := flag.String("output", "default", "Save the output to the specified filename")
-	align := flag.String("align", "default", "Tell the program to run the align function")
+	align := flag.String("align", "default", "Align the output to a specified alignment.")
+	help := flag.Bool("help", false, "Provide the user with a help file.")
 	flag.Parse()                  // parse the flags so that they can be used
 	additionalArgs := flag.Args() // tell the program to treat every argument following the flag from arg[o]
-	input := additionalArgs[0]
+	var input string
+	if len(additionalArgs) > 0 {
+		input = additionalArgs[0]
+	}
 	var bannerStyle string
 	if len(additionalArgs) == 2 {
 		bannerStyle = additionalArgs[1]
@@ -151,6 +156,15 @@ func main() {
 		fmt.Printf("Reverse flag is set to  %v\n", *reverse)
 		return
 	}
+
+	if *help {
+		cmd := exec.Command("cat", "help.txt")
+		cmd.Stdout = os.Stdout
+		if err := cmd.Run(); err != nil {
+			fmt.Println("could not run command: ", err)
+		}
+	}
+
 	if *color != "default" {
 		var colored string
 		var colorAll bool
