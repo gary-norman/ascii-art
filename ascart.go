@@ -7,9 +7,9 @@ import (
 	"log"
 	"os"
 	"os/exec"
-
-	// "regexp"
 	"strings"
+	"syscall"
+	"unsafe"
 )
 
 /**
@@ -64,6 +64,27 @@ func getChars(source []string) map[int][]string {
 	return charMap
 }
 
+func getCharsWidth(source []string) map[int]int {
+	charWidthMap := make(map[int]int)
+	id := 31
+	for _, line := range source {
+		if string(line) == "" {
+			id++
+		} else {
+			charWidthMap[id] = len(line)
+		}
+	}
+	return charWidthMap
+}
+
+func GetArtWidth(origString string, y map[int]int) int {
+	var width int
+	for _, char := range origString {
+		width += y[int(char)]
+	}
+	return width
+}
+
 // transform the input text origString to the output art, line by line
 func makeArt(origString string, y map[int][]string) string {
 	var art string
@@ -82,14 +103,23 @@ func makeArt(origString string, y map[int][]string) string {
 	return art
 }
 
-// Contains checks if a slice contains a specific element.
-func Contains(slice []rune, item rune) bool {
-	for _, v := range slice {
-		if v == item {
-			return true // Found the item
+// transform the input text origString to the output art, line by line, with justified content
+func makeArtAligned(origString string, y map[int][]string, spaces int) string {
+	var art string
+	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
+	wordSlice := strings.Split(replaceNewline, "\\n")
+	for _, word := range wordSlice {
+		for j := 0; j < len(y[32]); j++ {
+			var line string
+			art += strings.Repeat(" ", spaces)
+			for _, letter := range word {
+				line = line + y[int(letter)][j]
+			}
+			art += line + "\n"
+			line = ""
 		}
 	}
-	return false // Item not found
+	return art
 }
 
 // transform the input text origString to the output art, line by line, colorizing specified text
@@ -134,6 +164,52 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 	return art
 }
 
+// Contains checks if a slice contains a specific element.
+func Contains(slice []rune, item rune) bool {
+	for _, v := range slice {
+		if v == item {
+			return true // Found the item
+		}
+	}
+	return false // Item not found
+}
+
+func rightJust(s string, n int, fill string) string {
+	return strings.Repeat(fill, n) + s
+}
+
+func leftJust(s string, n int, fill string) string {
+	return s + strings.Repeat(fill, n)
+}
+
+func center(s string, n int, fill string) string {
+	div := n / 2
+	return strings.Repeat(fill, div) + s + strings.Repeat(fill, div)
+}
+
+// Winsize stores the height and width of the terminal.
+type Winsize struct {
+	Row    uint16
+	Col    uint16
+	Xpixel uint16 // unused
+	Ypixel uint16 // unused
+}
+
+func GetWinSize() Winsize {
+	// Get the file descriptor for stdout
+	fd := int(syscall.Stdout)
+
+	// Create an instance of Winsize
+	var ws Winsize
+
+	// Use the TIOCGWINSZ ioctl system call to get the window size
+	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&ws)))
+	if err != 0 {
+		fmt.Println("Error getting terminal size:", err)
+	}
+	return ws
+}
+
 func main() {
 	// ? flag definitions
 	reverse := flag.String("reverse", "default", "Convert ascii art from a specified file into a string of characters.")
@@ -141,6 +217,7 @@ func main() {
 	output := flag.String("output", "default", "Save the output to the specified filename")
 	align := flag.String("align", "default", "Align the output to a specified alignment.")
 	help := flag.Bool("help", false, "Provide the user with a help file.")
+	test := flag.Bool("test", false, "testing")
 	flag.Parse()                  // parse the flags so that they can be used
 	additionalArgs := flag.Args() // tell the program to treat every argument following the flag from arg[o]
 	var input string
@@ -156,7 +233,6 @@ func main() {
 		fmt.Printf("Reverse flag is set to  %v\n", *reverse)
 		return
 	}
-
 	if *help {
 		cmd := exec.Command("cat", "help.txt")
 		cmd.Stdout = os.Stdout
@@ -164,7 +240,6 @@ func main() {
 			fmt.Println("could not run command: ", err)
 		}
 	}
-
 	if *color != "default" {
 		var colored string
 		var colorAll bool
@@ -196,8 +271,16 @@ func main() {
 	}
 	// TODO complete align project
 	if *align != "default" {
-		fmt.Printf("align flag is set to  %v\n", *align)
+		ws := GetWinSize()
+		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		spaces := int(ws.Col) - ds
+		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), spaces))
+		//fmt.Println(rightJust(input, int(ws.Col)-ds, " "))
+		//print(int(ws.Col) - ds)
 		return
+	}
+	if *test {
+		fmt.Println(getChars(PrepareBan(bannerStyle)))
 	} else {
 		if len(additionalArgs) > 2 {
 			fmt.Println("Usage: go run . [STRING] [STYLE] (optional)\n\nEX: go run . \"something\" thinkertoy.\nAvailable styles are standard, shadow, and thinkertoy.")
