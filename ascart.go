@@ -73,6 +73,20 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
+// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
+func getChars(source []string) map[int][]string {
+	charMap := make(map[int][]string)
+	id := 31
+	for _, line := range source {
+		if string(line) == "" {
+			id++
+		} else {
+			charMap[id] = append(charMap[id], line)
+		}
+	}
+	return charMap
+}
+
 // FileToVariable * takes a file as input and return it as a slice of strings
 func FileToVariable(file *os.File) []string {
 	scanned := bufio.NewScanner(file)
@@ -86,20 +100,6 @@ func FileToVariable(file *os.File) []string {
 		return nil
 	}
 	return source
-}
-
-// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
-func getChars(source []string) map[int][]string {
-	charMap := make(map[int][]string)
-	id := 31
-	for _, line := range source {
-		if string(line) == "" {
-			id++
-		} else {
-			charMap[id] = append(charMap[id], line)
-		}
-	}
-	return charMap
 }
 
 // getEmptyCols * map the ascii characters provided in the reverse flag, zero indexed
@@ -124,12 +124,13 @@ func removeValidSPaceIndex(indices []int) []int {
 	fmt.Println(indices)
 	counter := 0
 	for i := 0; i < len(indices)-1; i++ {
-		if indices[i] == indices[i+1]-1 {
-			indices = append(indices[:i], indices[i+1:]...)
-			i -= 1
-			counter++
+		if len(indices)-i > 6 {
+			if indices[i] == (indices[i+6])-6 {
+				indices = append(indices[:i+1], indices[i+6:]...)
+			}
 		}
 	}
+	fmt.Println(counter)
 	return indices
 }
 
