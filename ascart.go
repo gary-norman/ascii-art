@@ -26,6 +26,30 @@ import (
 
 */
 
+// Winsize * struct that stores the height and width of the terminal.
+type Winsize struct {
+	Row    uint16
+	Col    uint16
+	Xpixel uint16 // unused
+	Ypixel uint16 // unused
+}
+
+// GetWinSize * populates the Winsize structure
+func GetWinSize() Winsize {
+	// Get the file descriptor for stdout
+	fd := syscall.Stdout
+
+	// Create an instance of Winsize
+	var ws Winsize
+
+	// Use the TIOCGWINSZ ioctl system call to get the window size
+	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&ws)))
+	if err != 0 {
+		fmt.Println("Error getting terminal size:", err)
+	}
+	return ws
+}
+
 // PrepareBan import standard.txt as the default ascii style, with ability to change it using 2nd argument *
 func PrepareBan(bannerStyle string) []string {
 	if bannerStyle == "" {
@@ -49,6 +73,7 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
+// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
 func getChars(source []string) map[int][]string {
 	charMap := make(map[int][]string)
 	id := 31
@@ -94,7 +119,17 @@ func GetArtWidth(origString string, y map[int]int) []int {
 	return width
 }
 
-// transform the input text origString to the output art, line by line
+// Contains * checks if a slice contains a specific element.
+func Contains(slice []rune, item rune) bool {
+	for _, v := range slice {
+		if v == item {
+			return true // Found the item
+		}
+	}
+	return false // Item not found
+}
+
+// makeArt * transform the input text origString to the output art, line by line
 func makeArt(origString string, y map[int][]string) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -112,8 +147,7 @@ func makeArt(origString string, y map[int][]string) string {
 	return art
 }
 
-// transform the input text origString to the output art, line by line, with justified content
-// * ^^ implement the use of all indices
+// makArtAligned * transform the input text origString to the output art, line by line, with justified content
 func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize, divider int) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -132,7 +166,26 @@ func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize,
 	return art
 }
 
-// transform the input text origString to the output art, line by line, colorizing specified text
+// makArtAligned * transform the input text origString to the output art, line by line, with justified content
+func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsize) string {
+	var art string
+	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
+	wordSlice := strings.Split(replaceNewline, "\\n")
+	for i := 0; i < len(wordSlice); i++ {
+		for j := 0; j < len(y[32]); j++ {
+			var line string
+			art += strings.Repeat(" ", int(ws.Col)-ds[i])
+			for _, letter := range wordSlice[i] {
+				line = line + y[int(letter)][j]
+			}
+			art += line + "\n"
+			line = ""
+		}
+	}
+	return art
+}
+
+// makArtColorized * transform the input text origString to the output art, line by line, colorizing specified text
 func makeArtColorized(origString string, y map[int][]string, letters []rune, color string, colorAll bool) string {
 	var specifiedColor string
 	reset := "\033[0m"
@@ -172,39 +225,6 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 		}
 	}
 	return art
-}
-
-// Contains checks if a slice contains a specific element.
-func Contains(slice []rune, item rune) bool {
-	for _, v := range slice {
-		if v == item {
-			return true // Found the item
-		}
-	}
-	return false // Item not found
-}
-
-// Winsize stores the height and width of the terminal.
-type Winsize struct {
-	Row    uint16
-	Col    uint16
-	Xpixel uint16 // unused
-	Ypixel uint16 // unused
-}
-
-func GetWinSize() Winsize {
-	// Get the file descriptor for stdout
-	fd := syscall.Stdout
-
-	// Create an instance of Winsize
-	var ws Winsize
-
-	// Use the TIOCGWINSZ ioctl system call to get the window size
-	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&ws)))
-	if err != 0 {
-		fmt.Println("Error getting terminal size:", err)
-	}
-	return ws
 }
 
 func main() {
