@@ -22,7 +22,7 @@ import (
 
 * ^^ output
 
-* TODO align
+* ^^ align
 
 */
 
@@ -147,7 +147,7 @@ func makeArt(origString string, y map[int][]string) string {
 	return art
 }
 
-// makArtAligned * transform the input text origString to the output art, line by line, with justified content
+// makArtAligned * transform the input text origString to the output art, line by line, with left, right, or center aligned content
 func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize, divider int) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -166,7 +166,7 @@ func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize,
 	return art
 }
 
-// makArtAligned * transform the input text origString to the output art, line by line, with justified content
+// makArtJustified * transform the input text origString to the output art, line by line, with justified content
 func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsize) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -174,9 +174,12 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 	for i := 0; i < len(wordSlice); i++ {
 		for j := 0; j < len(y[32]); j++ {
 			var line string
-			art += strings.Repeat(" ", int(ws.Col)-ds[i])
 			for _, letter := range wordSlice[i] {
 				line = line + y[int(letter)][j]
+				sliceLen := len(wordSlice[i])
+				if sliceLen >= 2 {
+					line = line + strings.Repeat(" ", (int(ws.Col)-ds[i])/(sliceLen-1))
+				}
 			}
 			art += line + "\n"
 			line = ""
@@ -288,7 +291,6 @@ func main() {
 		fmt.Printf("Output has been saved to %v\n", *output)
 		return
 	}
-	// TODO complete align project
 	if *align == "right" {
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
@@ -299,6 +301,12 @@ func main() {
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 2))
+		return
+	}
+	if *align == "justify" {
+		ws := GetWinSize()
+		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		fmt.Println(makeArtJustified(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		return
 	}
 	// test is for testing and debugging
