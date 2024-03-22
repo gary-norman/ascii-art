@@ -26,9 +26,7 @@ import (
 
 */
 
-// PrepareBan import standard.txt as the default ascii style, with ability to change it
-// using 2nd argument *
-// ^^ thinkertoy does not work
+// PrepareBan import standard.txt as the default ascii style, with ability to change it using 2nd argument *
 func PrepareBan(bannerStyle string) []string {
 	if bannerStyle == "" {
 		bannerStyle = "standard"
@@ -115,7 +113,7 @@ func makeArt(origString string, y map[int][]string) string {
 }
 
 // transform the input text origString to the output art, line by line, with justified content
-// * TODO implement the use of all indices
+// * ^^ implement the use of all indices
 func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize, divider int) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -217,8 +215,9 @@ func main() {
 	align := flag.String("align", "default", "Align the output to a specified alignment.")
 	help := flag.Bool("help", false, "Provide the user with a help file.")
 	test := flag.Bool("test", false, "testing")
-	flag.Parse()                  // parse the flags so that they can be used
-	additionalArgs := flag.Args() // tell the program to treat every argument following the flag from arg[o]
+	flag.Parse() // parse the flags so that they can be used
+	// define args to be non-flag arguments
+	additionalArgs := flag.Args() // tell the program to treat every argument following the flag as arg[o...]
 	var input string
 	if len(additionalArgs) > 0 {
 		input = additionalArgs[0]
@@ -227,6 +226,7 @@ func main() {
 	if len(additionalArgs) == 2 {
 		bannerStyle = additionalArgs[1]
 	}
+	// call the functions depending on the flag
 	// TODO complete reverse project
 	if *reverse != "default" {
 		fmt.Printf("Reverse flag is set to  %v\n", *reverse)
@@ -281,9 +281,11 @@ func main() {
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 2))
 		return
 	}
+	// test is for testing and debugging
 	if *test {
 		fmt.Println(getChars(PrepareBan(bannerStyle)))
 	} else {
+		// default output
 		if len(additionalArgs) > 2 {
 			fmt.Println("Usage: go run . [STRING] [STYLE] (optional)\n\nEX: go run . \"something\" thinkertoy.\nAvailable styles are standard, shadow, and thinkertoy.")
 		}
