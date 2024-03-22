@@ -64,6 +64,7 @@ func getChars(source []string) map[int][]string {
 	return charMap
 }
 
+// getCharsWidth * determine the width of each individual ascii art character
 func getCharsWidth(source []string) map[int]int {
 	charWidthMap := make(map[int]int)
 	id := 31
@@ -77,11 +78,22 @@ func getCharsWidth(source []string) map[int]int {
 	return charWidthMap
 }
 
-func GetArtWidth(origString string, y map[int]int) int {
-	var width int
-	for _, char := range origString {
-		width += y[int(char)]
+// GetArtWidth * determine the width of each line that gets printed to the terminal (without EOL)
+func GetArtWidth(origString string, y map[int]int) []int {
+	var width []int
+	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
+	wordSlice := strings.Split(replaceNewline, "\\n")
+	for i := 0; i < len(wordSlice); i++ {
+		sum := 0
+		for _, char := range wordSlice[i] {
+			sum += y[int(char)]
+			//for _, num := range y[int(char)] {
+			//	sum += num
+			//}
+		}
+		width = append(width, sum)
 	}
+	fmt.Println(width)
 	return width
 }
 
@@ -104,15 +116,16 @@ func makeArt(origString string, y map[int][]string) string {
 }
 
 // transform the input text origString to the output art, line by line, with justified content
-func makeArtAligned(origString string, y map[int][]string, spaces int) string {
+// * TODO implement the use of all indices
+func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
 	wordSlice := strings.Split(replaceNewline, "\\n")
-	for _, word := range wordSlice {
+	for i := 0; i < len(wordSlice); i++ {
 		for j := 0; j < len(y[32]); j++ {
 			var line string
-			art += strings.Repeat(" ", spaces)
-			for _, letter := range word {
+			art += strings.Repeat(" ", int(ws.Col)-ds[i])
+			for _, letter := range wordSlice[i] {
 				line = line + y[int(letter)][j]
 			}
 			art += line + "\n"
@@ -273,8 +286,7 @@ func main() {
 	if *align != "default" {
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
-		spaces := int(ws.Col) - ds
-		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), spaces))
+		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		//fmt.Println(rightJust(input, int(ws.Col)-ds, " "))
 		//print(int(ws.Col) - ds)
 		return
