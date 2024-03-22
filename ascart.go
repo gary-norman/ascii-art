@@ -73,6 +73,21 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
+// FileToVariable * takes a file as input and return it as a slice of strings
+func FileToVariable(file *os.File) []string {
+	scanned := bufio.NewScanner(file)
+	scanned.Split(bufio.ScanLines)
+	var source []string
+	for scanned.Scan() {
+		source = append(source, scanned.Text())
+	}
+	errClose := file.Close()
+	if errClose != nil {
+		return nil
+	}
+	return source
+}
+
 // getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
 func getChars(source []string) map[int][]string {
 	charMap := make(map[int][]string)
@@ -85,6 +100,23 @@ func getChars(source []string) map[int][]string {
 		}
 	}
 	return charMap
+}
+
+// getEmptyCols * map the ascii characters provided in the reverse flag, zero indexed
+func getEmptyCols(source []string) []int {
+	var emptyCols []int
+	for i := 0; i < len(source[0]); i++ {
+		empty := true
+		for j := 0; j < len(source); j++ {
+			if source[j][i] != 32 {
+				empty = false
+			}
+		}
+		if empty == true {
+			emptyCols = append(emptyCols, i)
+		}
+	}
+	return emptyCols
 }
 
 // getCharsWidth * determine the width of each individual ascii art character
@@ -250,11 +282,6 @@ func main() {
 		bannerStyle = additionalArgs[1]
 	}
 	// call the functions depending on the flag
-	// TODO complete reverse project
-	if *reverse != "default" {
-		fmt.Printf("Reverse flag is set to  %v\n", *reverse)
-		return
-	}
 	if *help {
 		cmd := exec.Command("cat", "help.txt")
 		cmd.Stdout = os.Stdout
@@ -308,6 +335,15 @@ func main() {
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtJustified(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		return
+	}
+	// TODO complete reverse project
+	if *reverse != "default" {
+		file, err := os.Open(*reverse)
+		if err != nil {
+			log.Fatal(err)
+		}
+		emptyCols := getEmptyCols(FileToVariable(file))
+		fmt.Println(emptyCols)
 	}
 	// test is for testing and debugging
 	if *test {
