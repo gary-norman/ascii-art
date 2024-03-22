@@ -119,6 +119,20 @@ func getEmptyCols(source []string) []int {
 	return emptyCols
 }
 
+// removeValidSPaceIndex * remove indices for valid spaces, before the end space
+func removeValidSPaceIndex(indices []int) []int {
+	fmt.Println(indices)
+	counter := 0
+	for i := 0; i < len(indices)-1; i++ {
+		if indices[i] == indices[i+1]-1 {
+			indices = append(indices[:i], indices[i+1:]...)
+			i -= 1
+			counter++
+		}
+	}
+	return indices
+}
+
 // getCharsWidth * determine the width of each individual ascii art character
 func getCharsWidth(source []string) map[int]int {
 	charWidthMap := make(map[int]int)
@@ -342,7 +356,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		emptyCols := getEmptyCols(FileToVariable(file))
+		emptyCols := removeValidSPaceIndex(getEmptyCols(FileToVariable(file)))
 		fmt.Println(emptyCols)
 	}
 	// test is for testing and debugging
