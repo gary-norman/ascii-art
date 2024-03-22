@@ -117,14 +117,14 @@ func makeArt(origString string, y map[int][]string) string {
 
 // transform the input text origString to the output art, line by line, with justified content
 // * TODO implement the use of all indices
-func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize) string {
+func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize, divider int) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
 	wordSlice := strings.Split(replaceNewline, "\\n")
 	for i := 0; i < len(wordSlice); i++ {
 		for j := 0; j < len(y[32]); j++ {
 			var line string
-			art += strings.Repeat(" ", int(ws.Col)-ds[i])
+			art += strings.Repeat(" ", (int(ws.Col)-ds[i])/divider)
 			for _, letter := range wordSlice[i] {
 				line = line + y[int(letter)][j]
 			}
@@ -283,12 +283,16 @@ func main() {
 		return
 	}
 	// TODO complete align project
-	if *align != "default" {
+	if *align == "right" {
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
-		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws))
-		//fmt.Println(rightJust(input, int(ws.Col)-ds, " "))
-		//print(int(ws.Col) - ds)
+		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 1))
+		return
+	}
+	if *align == "center" {
+		ws := GetWinSize()
+		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 2))
 		return
 	}
 	if *test {
