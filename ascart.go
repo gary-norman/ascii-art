@@ -187,19 +187,6 @@ func Contains(slice []rune, item rune) bool {
 	return false // Item not found
 }
 
-func rightJust(s string, n int, fill string) string {
-	return strings.Repeat(fill, n) + s
-}
-
-func leftJust(s string, n int, fill string) string {
-	return s + strings.Repeat(fill, n)
-}
-
-func center(s string, n int, fill string) string {
-	div := n / 2
-	return strings.Repeat(fill, div) + s + strings.Repeat(fill, div)
-}
-
 // Winsize stores the height and width of the terminal.
 type Winsize struct {
 	Row    uint16
