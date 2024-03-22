@@ -93,7 +93,6 @@ func GetArtWidth(origString string, y map[int]int) []int {
 		}
 		width = append(width, sum)
 	}
-	fmt.Println(width)
 	return width
 }
 
@@ -197,7 +196,7 @@ type Winsize struct {
 
 func GetWinSize() Winsize {
 	// Get the file descriptor for stdout
-	fd := int(syscall.Stdout)
+	fd := syscall.Stdout
 
 	// Create an instance of Winsize
 	var ws Winsize
