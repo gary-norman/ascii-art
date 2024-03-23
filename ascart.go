@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
 	"syscall"
 	"unsafe"
@@ -87,7 +88,7 @@ func getChars(source []string) map[int][]string {
 	return charMap
 }
 
-// FileToVariable * takes a file as input and return it as a slice of strings
+// FileToVariable * takes a file as input and returns it as a slice of strings
 func FileToVariable(file *os.File) []string {
 	scanned := bufio.NewScanner(file)
 	scanned.Split(bufio.ScanLines)
@@ -102,11 +103,15 @@ func FileToVariable(file *os.File) []string {
 	return source
 }
 
+// slicesEqual * checks if two slices of strings are identical.
+func slicesEqual(slice1, slice2 []string) bool {
+	return reflect.DeepEqual(slice1, slice2)
+}
+
 // artToSingleLine * TODO places each line of characters from FileToVariable on a single line
 
 // getEmptyCols * get the index of the final space of each character in the reverse flag
 func getEmptyCols(source []string) []int {
-	fmt.Println(source)
 	var emptyCols []int
 	for i := 0; i < len(source[0]); i++ {
 		empty := true
@@ -147,11 +152,11 @@ func getInputChars(source []string, indices []int) map[int][]string {
 	return charMap
 }
 
-func compareAscii(input map[int][]int, standard map[int][]int, shadow map[int][]int, thinkertoy map[int][]int) {
-	for key, value := range input {
-		for index, stanLine := range standard {
-			if line == stanLine {
-
+func compareAscii(input map[int][]string, standard map[int][]string, shadow map[int][]string, thinkertoy map[int][]string) {
+	for _, slice1 := range input {
+		for key2, slice2 := range standard {
+			if slicesEqual(slice1, slice2) {
+				fmt.Println(key2)
 			}
 		}
 	}
@@ -214,6 +219,7 @@ func makeArt(origString string, y map[int][]string) string {
 			line = ""
 		}
 	}
+	art = strings.TrimRight(art, "\n")
 	return art
 }
 
@@ -383,17 +389,14 @@ func main() {
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
 		charMap := getInputChars(source, emptyCols)
-		asciiChars := getChars(PrepareBan(bannerStyle))
-		for _, line := range asciiChars {
-			for k, v := range line {
-				fmt.Println(k, ":", v)
-			}
+		asciiMap := getChars(PrepareBan(bannerStyle))
+		compareAscii(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
+		for k, v := range charMap {
+			fmt.Println(k, ":", v)
 		}
-		for _, line := range charMap {
-			for k, v := range line {
-				fmt.Println(k, ":", v)
-			}
-		}
+		fmt.Printf("104 %v\n", asciiMap[104])
+		fmt.Printf("101 %v\n", asciiMap[101])
+		fmt.Printf("121 %v\n", asciiMap[121])
 	}
 	// test is for testing and debugging
 	if *test {
