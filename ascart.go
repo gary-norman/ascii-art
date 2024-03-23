@@ -138,13 +138,23 @@ func removeValidSPaceIndex(indices []int) []int {
 func getInputChars(source []string, indices []int) map[int][]string {
 	charMap := make(map[int][]string)
 	startIndex := 0
-	for id, _ := range indices {
+	for id := range indices {
 		for _, line := range source {
 			charMap[id] = append(charMap[id], line[startIndex:indices[id]])
 		}
 		startIndex = indices[id] + 1
 	}
 	return charMap
+}
+
+func compareAscii(input map[int][]int, standard map[int][]int, shadow map[int][]int, thinkertoy map[int][]int) {
+	for key, value := range input {
+		for index, stanLine := range standard {
+			if line == stanLine {
+
+			}
+		}
+	}
 }
 
 // getCharsWidth * determine the width of each individual ascii art character
