@@ -102,8 +102,11 @@ func FileToVariable(file *os.File) []string {
 	return source
 }
 
-// getEmptyCols * map the ascii characters provided in the reverse flag, zero indexed
+// artToSingleLine * TODO places each line of characters from FileToVariable on a single line
+
+// getEmptyCols * get the index of the final space of each character in the reverse flag
 func getEmptyCols(source []string) []int {
+	fmt.Println(source)
 	var emptyCols []int
 	for i := 0; i < len(source[0]); i++ {
 		empty := true
@@ -121,8 +124,6 @@ func getEmptyCols(source []string) []int {
 
 // removeValidSPaceIndex * remove indices for valid spaces, before the end space
 func removeValidSPaceIndex(indices []int) []int {
-	fmt.Println(indices)
-	counter := 0
 	for i := 0; i < len(indices)-1; i++ {
 		if len(indices)-i > 6 {
 			if indices[i] == (indices[i+6])-6 {
@@ -130,8 +131,20 @@ func removeValidSPaceIndex(indices []int) []int {
 			}
 		}
 	}
-	fmt.Println(counter)
 	return indices
+}
+
+// getInputChars * map the ascii characters provided in the reverse flag, zero indexed
+func getInputChars(source []string, indices []int) map[int][]string {
+	charMap := make(map[int][]string)
+	startIndex := 0
+	for id, _ := range indices {
+		for _, line := range source {
+			charMap[id] = append(charMap[id], line[startIndex:indices[id]])
+		}
+		startIndex = indices[id] + 1
+	}
+	return charMap
 }
 
 // getCharsWidth * determine the width of each individual ascii art character
@@ -357,8 +370,20 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		emptyCols := removeValidSPaceIndex(getEmptyCols(FileToVariable(file)))
-		fmt.Println(emptyCols)
+		source := FileToVariable(file)
+		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
+		charMap := getInputChars(source, emptyCols)
+		asciiChars := getChars(PrepareBan(bannerStyle))
+		for _, line := range asciiChars {
+			for k, v := range line {
+				fmt.Println(k, ":", v)
+			}
+		}
+		for _, line := range charMap {
+			for k, v := range line {
+				fmt.Println(k, ":", v)
+			}
+		}
 	}
 	// test is for testing and debugging
 	if *test {
