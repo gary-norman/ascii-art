@@ -145,7 +145,7 @@ func getInputChars(source []string, indices []int) map[int][]string {
 	startIndex := 0
 	for id := range indices {
 		for _, line := range source {
-			charMap[id] = append(charMap[id], line[startIndex:indices[id]])
+			charMap[id] = append(charMap[id], line[startIndex:indices[id]]+" ")
 		}
 		startIndex = indices[id] + 1
 	}
