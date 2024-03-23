@@ -239,6 +239,7 @@ func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize,
 			line = ""
 		}
 	}
+	art = strings.TrimRight(art, "\n")
 	return art
 }
 
@@ -261,6 +262,7 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 			line = ""
 		}
 	}
+	art = strings.TrimRight(art, "\n")
 	return art
 }
 
@@ -303,6 +305,7 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 			line = ""
 		}
 	}
+	art = strings.TrimRight(art, "\n")
 	return art
 }
 
