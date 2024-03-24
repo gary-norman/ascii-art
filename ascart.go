@@ -152,16 +152,21 @@ func getInputChars(source []string, indices []int) map[int][]string {
 	return charMap
 }
 
-func compareAscii(input, standard, shadow, thinkertoy map[int][]string) {
+// AsciiToChars * compares getChar and getInputChar and prints the string to the terminal
+func AsciiToChars(input, standard, shadow, thinkertoy map[int][]string) {
+	output := make(map[int][]int)
 	styles := []map[int][]string{standard, shadow, thinkertoy}
 	for _, style := range styles {
-		for _, slice1 := range input {
+		for key1, slice1 := range input {
 			for key2, slice2 := range style {
 				if slicesEqual(slice1, slice2) {
-					fmt.Printf("%c", key2)
+					output[key1] = append(output[key1], key2)
 				}
 			}
 		}
+	}
+	for i := 0; i < len(output); i++ {
+		fmt.Printf("%c", output[i][0])
 	}
 }
 
@@ -368,6 +373,7 @@ func main() {
 		fmt.Printf("Output has been saved to %v\n", *output)
 		return
 	}
+	// TODO * error message
 	if *align == "right" {
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
@@ -395,8 +401,9 @@ func main() {
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
 		charMap := getInputChars(source, emptyCols)
-		//asciiMap := getChars(PrepareBan(bannerStyle))
-		compareAscii(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
+		AsciiToChars(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
+		//asciiMap := getChars(PrepareBan("thinkertoy"))
+		//fmt.Println("")
 		//for k, v := range charMap {
 		//	fmt.Println(k, ":", v)
 		//}
