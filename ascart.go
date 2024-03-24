@@ -152,11 +152,14 @@ func getInputChars(source []string, indices []int) map[int][]string {
 	return charMap
 }
 
-func compareAscii(input map[int][]string, standard map[int][]string, shadow map[int][]string, thinkertoy map[int][]string) {
-	for _, slice1 := range input {
-		for key2, slice2 := range standard {
-			if slicesEqual(slice1, slice2) {
-				fmt.Println(key2)
+func compareAscii(input, standard, shadow, thinkertoy map[int][]string) {
+	styles := []map[int][]string{standard, shadow, thinkertoy}
+	for _, style := range styles {
+		for _, slice1 := range input {
+			for key2, slice2 := range style {
+				if slicesEqual(slice1, slice2) {
+					fmt.Printf("%c", key2)
+				}
 			}
 		}
 	}
@@ -208,18 +211,18 @@ func Contains(slice []rune, item rune) bool {
 func makeArt(origString string, y map[int][]string) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
-	wordSlice := strings.Split(replaceNewline, "\\n")
-	for _, word := range wordSlice {
-		for j := 0; j < len(y[32]); j++ {
+	wordSlice := strings.Split(replaceNewline, "\\n")               //split the input into slices
+	for _, word := range wordSlice {                                // loop over the word to get the characters
+		for j := 0; j < len(y[32]); j++ { // loop over each vertical line of the word
 			var line string
-			for _, letter := range word {
-				line = line + y[int(letter)][j]
+			for _, letter := range word { // loop over each character
+				line = line + y[int(letter)][j] // add each line of the character to the line string
 			}
-			art += line + "\n"
+			art += line + "\n" // add each line string (followed by a line break) to the final output
 			line = ""
 		}
 	}
-	art = strings.TrimRight(art, "\n")
+	art = strings.TrimRight(art, "\n") // remove the final line break
 	return art
 }
 
@@ -392,14 +395,14 @@ func main() {
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
 		charMap := getInputChars(source, emptyCols)
-		asciiMap := getChars(PrepareBan(bannerStyle))
+		//asciiMap := getChars(PrepareBan(bannerStyle))
 		compareAscii(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
-		for k, v := range charMap {
-			fmt.Println(k, ":", v)
-		}
-		fmt.Printf("104 %v\n", asciiMap[104])
-		fmt.Printf("101 %v\n", asciiMap[101])
-		fmt.Printf("121 %v\n", asciiMap[121])
+		//for k, v := range charMap {
+		//	fmt.Println(k, ":", v)
+		//}
+		//fmt.Printf("104 %v\n", asciiMap[104])
+		//fmt.Printf("101 %v\n", asciiMap[101])
+		//fmt.Printf("121 %v\n", asciiMap[121])
 	}
 	// test is for testing and debugging
 	if *test {
