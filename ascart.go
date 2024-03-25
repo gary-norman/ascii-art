@@ -14,7 +14,7 @@ import (
 )
 
 /**
-* TODO reverse
+* ^^ reverse
 
 * ^^ fs
 	* ^^ SOLVED functionality works with shadow and standard but not with thinkertoy
@@ -108,7 +108,20 @@ func slicesEqual(slice1, slice2 []string) bool {
 	return reflect.DeepEqual(slice1, slice2)
 }
 
-// artToSingleLine * TODO places each line of characters from FileToVariable on a single line
+// CompareSlices * compares two slices for equality.
+func CompareSlices(slice1, slice2 []string) bool {
+	if len(slice1) != len(slice2) {
+		return false // Slices are of different lengths
+	}
+	for i, v := range slice1 {
+		if v != slice2[i] {
+			return false // Elements at the same position are different
+		}
+	}
+	return true // Slices are equal
+}
+
+// artToSingleLine * places each line of characters from FileToVariable on a single line, delineated by "** "
 func artToSingleLine(source []string) []string {
 	var output []string
 	if len(source) == 8 {
@@ -123,7 +136,7 @@ func artToSingleLine(source []string) []string {
 	x := 0
 	for len(source) > 0 {
 		for i := 0; i < 8; i++ {
-			output = append(output, output[i+x]+"** "+source[i])
+			output = append(output, output[i+x]+"* "+"# "+source[i])
 		}
 		x += 8
 		if len(source) > 8 {
@@ -140,6 +153,7 @@ func artToSingleLine(source []string) []string {
 
 // getEmptyCols * get the index of the final space of each character in the reverse flag
 func getEmptyCols(source []string) []int {
+	source = artToSingleLine(source)
 	var emptyCols []int
 	for i := 0; i < len(source[0]); i++ {
 		empty := true
@@ -177,9 +191,6 @@ func getInputChars(source []string, indices []int) map[int][]string {
 		}
 		startIndex = indices[id] + 1
 	}
-	for _, line := range source {
-		fmt.Println(line)
-	}
 	return charMap
 
 }
@@ -187,11 +198,27 @@ func getInputChars(source []string, indices []int) map[int][]string {
 // AsciiToChars * compares getChar and getInputChar and prints the string to the terminal
 func AsciiToChars(input, standard, shadow, thinkertoy map[int][]string) {
 	output := make(map[int][]int)
+	var newLine1 []string
+	for i := 0; i < 8; i++ {
+		newLine1 = append(newLine1, "* ")
+	}
+	var newLine2 []string
+	for i := 0; i < 8; i++ {
+		newLine2 = append(newLine2, "# ")
+	}
+	slash := 92
+	n := 110
 	styles := []map[int][]string{standard, shadow, thinkertoy}
 	for _, style := range styles {
 		for key1, slice1 := range input {
 			for key2, slice2 := range style {
-				if slicesEqual(slice1, slice2) {
+				if CompareSlices(slice1, newLine1) {
+					output[key1] = append(output[key1], slash)
+				}
+				if CompareSlices(slice1, newLine2) {
+					output[key1] = append(output[key1], n)
+				}
+				if CompareSlices(slice1, slice2) {
 					output[key1] = append(output[key1], key2)
 				}
 			}
@@ -424,24 +451,16 @@ func main() {
 		fmt.Println(makeArtJustified(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		return
 	}
-	// TODO complete reverse project
 	if *reverse != "default" {
+		// TODO * error message
 		file, err := os.Open(*reverse)
 		if err != nil {
 			log.Fatal(err)
 		}
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
-		charMap := getInputChars(source, emptyCols)
+		charMap := getInputChars(artToSingleLine(source), emptyCols)
 		AsciiToChars(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
-		//asciiMap := getChars(PrepareBan("thinkertoy"))
-		//fmt.Println("")
-		//for k, v := range charMap {
-		//	fmt.Println(k, ":", v)
-		//}
-		//fmt.Printf("104 %v\n", asciiMap[104])
-		//fmt.Printf("101 %v\n", asciiMap[101])
-		//fmt.Printf("121 %v\n", asciiMap[121])
 	}
 	// test is for testing and debugging
 	if *test {
