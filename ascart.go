@@ -12,7 +12,7 @@ import (
 	"unsafe"
 )
 
-// Winsize * struct that stores the height and width of the terminal.
+// Winsize is a struct that stores the height and width of the terminal.
 type Winsize struct {
 	Row    uint16
 	Col    uint16
@@ -22,7 +22,7 @@ type Winsize struct {
 
 // *************** Global Functions *************** //
 
-// GetWinSize * populates the Winsize structure
+// GetWinSize populates the Winsize structure
 func GetWinSize() Winsize {
 	// Get the file descriptor for stdout
 	fd := syscall.Stdout
@@ -61,7 +61,7 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
-// FileToVariable * takes a file as input and returns it as a slice of strings
+// FileToVariable takes a file as input and returns it as a slice of strings
 func FileToVariable(file *os.File) []string {
 	scanned := bufio.NewScanner(file)
 	scanned.Split(bufio.ScanLines)
@@ -76,7 +76,7 @@ func FileToVariable(file *os.File) []string {
 	return source
 }
 
-// CompareSlices * compares two slices for equality.
+// CompareSlices compares two slices for equality.
 func CompareSlices(slice1, slice2 []string) bool {
 	if len(slice1) != len(slice2) {
 		return false // Slices are of different lengths
@@ -89,7 +89,7 @@ func CompareSlices(slice1, slice2 []string) bool {
 	return true // Slices are equal
 }
 
-// Contains * checks if a slice contains a specific element.
+// Contains checks if a slice contains a specific element.
 func Contains(slice []rune, item rune) bool {
 	for _, v := range slice {
 		if v == item {
@@ -99,7 +99,7 @@ func Contains(slice []rune, item rune) bool {
 	return false // Item not found
 }
 
-// CheckFlagSkipsEquals * checks if the value passed to the flag uses <flag>=<argument> format
+// CheckFlagSkipsEquals checks if the value passed to the flag uses <flag>=<argument> format
 func CheckFlagSkipsEquals(flag string) bool {
 	usedEqualsSyntax := true
 	for _, arg := range os.Args[1:] {
@@ -113,7 +113,7 @@ func CheckFlagSkipsEquals(flag string) bool {
 
 // *************** Helper Functions *************** //
 
-// artToSingleLine * places each line of characters from FileToVariable on a single line, delineated by "** "
+// Places each line of characters from FileToVariable on a single line, delineated by "** "
 func artToSingleLine(source []string) []string {
 	var output []string
 	if len(source) == 8 {
@@ -143,7 +143,7 @@ func artToSingleLine(source []string) []string {
 	return output
 }
 
-// getEmptyCols * get the index of the final space of each character in the reverse flag
+// Get the index of the final space of each character in the reverse flag
 func getEmptyCols(source []string) []int {
 	source = artToSingleLine(source)
 	var emptyCols []int
@@ -161,7 +161,7 @@ func getEmptyCols(source []string) []int {
 	return emptyCols
 }
 
-// removeValidSPaceIndex * remove indices for valid spaces, before the end space
+// Remove indices for valid spaces, before the end space
 func removeValidSPaceIndex(indices []int) []int {
 	for i := 0; i < len(indices)-1; i++ {
 		if len(indices)-i > 6 {
@@ -173,7 +173,7 @@ func removeValidSPaceIndex(indices []int) []int {
 	return indices
 }
 
-// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
+// Map the ascii characters provided in the style.txt file, indexed by ascii code
 func getChars(source []string) map[int][]string {
 	charMap := make(map[int][]string)
 	id := 31
@@ -187,7 +187,7 @@ func getChars(source []string) map[int][]string {
 	return charMap
 }
 
-// getInputChars * map the ascii characters provided in the reverse flag, zero indexed
+// Map the ascii characters provided in the reverse flag, zero indexed
 func getInputChars(source []string, indices []int) map[int][]string {
 	charMap := make(map[int][]string)
 	startIndex := 0
@@ -201,8 +201,8 @@ func getInputChars(source []string, indices []int) map[int][]string {
 
 }
 
-// AsciiToChars * compares getChar and getInputChar and prints the string to the terminal
-func AsciiToChars(input, standard, shadow, thinkertoy map[int][]string) {
+// Compares getChar and getInputChar and prints the string to the terminal
+func asciiToChars(input, standard, shadow, thinkertoy map[int][]string) {
 	output := make(map[int][]int)
 	var newLine1 []string
 	for i := 0; i < 8; i++ {
@@ -235,7 +235,7 @@ func AsciiToChars(input, standard, shadow, thinkertoy map[int][]string) {
 	}
 }
 
-// getCharsWidth * determine the width of each individual ascii art character
+// Determine the width of each individual ascii art character
 func getCharsWidth(source []string) map[int]int {
 	charWidthMap := make(map[int]int)
 	id := 31
@@ -249,8 +249,8 @@ func getCharsWidth(source []string) map[int]int {
 	return charWidthMap
 }
 
-// GetArtWidth * determine the width of each line that gets printed to the terminal (without EOL)
-func GetArtWidth(origString string, y map[int]int) []int {
+// Determine the width of each line that gets printed to the terminal (without EOL)
+func getArtWidth(origString string, y map[int]int) []int {
 	var width []int
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
 	wordSlice := strings.Split(replaceNewline, "\\n")
@@ -269,7 +269,7 @@ func GetArtWidth(origString string, y map[int]int) []int {
 
 // *************** Final Output Functions *************** //
 
-// makeArt * transform the input text origString to the output art, line by line
+// Transform the input text origString to the output art, line by line
 func makeArt(origString string, y map[int][]string) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -288,7 +288,7 @@ func makeArt(origString string, y map[int][]string) string {
 	return art
 }
 
-// makArtAligned * transform the input text origString to the output art, line by line, with left, right, or center aligned content
+// Transform the input text origString to the output art, line by line, with left, right, or center aligned content
 func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize, divider int) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -308,7 +308,7 @@ func makeArtAligned(origString string, y map[int][]string, ds []int, ws Winsize,
 	return art
 }
 
-// makArtJustified * transform the input text origString to the output art, line by line, with justified content
+// Transform the input text origString to the output art, line by line, with justified content
 func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsize) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -331,7 +331,7 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 	return art
 }
 
-// makArtColorized * transform the input text origString to the output art, line by line, colorizing specified text
+// Transform the input text origString to the output art, line by line, colorizing specified text
 func makeArtColorized(origString string, y map[int][]string, letters []rune, color string, colorAll bool) string {
 	var specifiedColor string
 	reset := "\033[0m"
@@ -376,13 +376,17 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 
 func main() {
 	// ? flag definitions
-	reverse := flag.String("reverse", "default", "Convert ascii art from a specified file into a string of characters.")
+	reverse := flag.String("reverse", "default",
+		"Convert ascii art from a specified file into a string of characters.")
 	skipsFlagReverse := CheckFlagSkipsEquals("--reverse=")
-	color := flag.String("color", "default", "Format the output into a specified colour, either the entire text, or limited to specified characters.")
+	color := flag.String("color", "default",
+		"Format the output into a specified colour, either the entire text, or limited to specified characters.")
 	skipsFlagColor := CheckFlagSkipsEquals("--color=")
-	output := flag.String("output", "default", "Save the output to the specified filename")
+	output := flag.String("output", "default",
+		"Save the output to the specified filename")
 	skipsFlagOutput := CheckFlagSkipsEquals("--output=")
-	align := flag.String("align", "default", "Align the output to a specified alignment.")
+	align := flag.String("align", "default",
+		"Align the output to a specified alignment.")
 	skipsFlagAlign := CheckFlagSkipsEquals("--align=")
 	help := flag.Bool("help", false, "Provide the user with a help file.")
 	test := flag.Bool("test", false, "testing")
@@ -448,7 +452,7 @@ func main() {
 			return
 		}
 		ws := GetWinSize()
-		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		ds := getArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 1))
 		return
 	}
@@ -458,7 +462,7 @@ func main() {
 			return
 		}
 		ws := GetWinSize()
-		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		ds := getArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 2))
 		return
 	}
@@ -468,7 +472,7 @@ func main() {
 			return
 		}
 		ws := GetWinSize()
-		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
+		ds := getArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtJustified(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		return
 	}
@@ -487,7 +491,11 @@ func main() {
 		mapStandard := getChars(PrepareBan("standard"))
 		mapShadow := getChars(PrepareBan("shadow"))
 		mapThinkertoy := getChars(PrepareBan("thinkertoy"))
-		AsciiToChars(charMap, mapStandard, mapShadow, mapThinkertoy)
+		asciiToChars(charMap, mapStandard, mapShadow, mapThinkertoy)
+		errClose := file.Close()
+		if errClose != nil {
+			log.Fatal(err)
+		}
 	}
 	// test is for testing and debugging
 	if *test {
