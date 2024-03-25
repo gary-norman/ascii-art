@@ -7,25 +7,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"reflect"
 	"strings"
 	"syscall"
 	"unsafe"
 )
-
-/**
-* ^^ reverse
-
-* ^^ fs
-	* ^^ SOLVED functionality works with shadow and standard but not with thinkertoy
-
-* ^^ color
-
-* ^^ output
-
-* ^^ align
-
-*/
 
 // Winsize * struct that stores the height and width of the terminal.
 type Winsize struct {
@@ -34,6 +19,8 @@ type Winsize struct {
 	Xpixel uint16 // unused
 	Ypixel uint16 // unused
 }
+
+// *************** Global Functions *************** //
 
 // GetWinSize * populates the Winsize structure
 func GetWinSize() Winsize {
@@ -74,20 +61,6 @@ func PrepareBan(bannerStyle string) []string {
 	return source
 }
 
-// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
-func getChars(source []string) map[int][]string {
-	charMap := make(map[int][]string)
-	id := 31
-	for _, line := range source {
-		if string(line) == "" {
-			id++
-		} else {
-			charMap[id] = append(charMap[id], line)
-		}
-	}
-	return charMap
-}
-
 // FileToVariable * takes a file as input and returns it as a slice of strings
 func FileToVariable(file *os.File) []string {
 	scanned := bufio.NewScanner(file)
@@ -103,11 +76,6 @@ func FileToVariable(file *os.File) []string {
 	return source
 }
 
-// slicesEqual * checks if two slices of strings are identical.
-func slicesEqual(slice1, slice2 []string) bool {
-	return reflect.DeepEqual(slice1, slice2)
-}
-
 // CompareSlices * compares two slices for equality.
 func CompareSlices(slice1, slice2 []string) bool {
 	if len(slice1) != len(slice2) {
@@ -120,6 +88,30 @@ func CompareSlices(slice1, slice2 []string) bool {
 	}
 	return true // Slices are equal
 }
+
+// Contains * checks if a slice contains a specific element.
+func Contains(slice []rune, item rune) bool {
+	for _, v := range slice {
+		if v == item {
+			return true // Found the item
+		}
+	}
+	return false // Item not found
+}
+
+// CheckFlagSkipsEquals * checks if the value passed to the flag uses <flag>=<argument> format
+func CheckFlagSkipsEquals(flag string) bool {
+	usedEqualsSyntax := true
+	for _, arg := range os.Args[1:] {
+		// Check if the argument starts with the flag name followed by "="
+		if strings.HasPrefix(arg, flag) {
+			usedEqualsSyntax = false
+		}
+	}
+	return usedEqualsSyntax
+}
+
+// *************** Helper Functions *************** //
 
 // artToSingleLine * places each line of characters from FileToVariable on a single line, delineated by "** "
 func artToSingleLine(source []string) []string {
@@ -179,6 +171,20 @@ func removeValidSPaceIndex(indices []int) []int {
 		}
 	}
 	return indices
+}
+
+// getChars * map the ascii characters provided in the style.txt file, indexed by ascii code
+func getChars(source []string) map[int][]string {
+	charMap := make(map[int][]string)
+	id := 31
+	for _, line := range source {
+		if string(line) == "" {
+			id++
+		} else {
+			charMap[id] = append(charMap[id], line)
+		}
+	}
+	return charMap
 }
 
 // getInputChars * map the ascii characters provided in the reverse flag, zero indexed
@@ -261,15 +267,7 @@ func GetArtWidth(origString string, y map[int]int) []int {
 	return width
 }
 
-// Contains * checks if a slice contains a specific element.
-func Contains(slice []rune, item rune) bool {
-	for _, v := range slice {
-		if v == item {
-			return true // Found the item
-		}
-	}
-	return false // Item not found
-}
+// *************** Final Output Functions *************** //
 
 // makeArt * transform the input text origString to the output art, line by line
 func makeArt(origString string, y map[int][]string) string {
@@ -379,9 +377,13 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 func main() {
 	// ? flag definitions
 	reverse := flag.String("reverse", "default", "Convert ascii art from a specified file into a string of characters.")
+	skipsFlagReverse := CheckFlagSkipsEquals("--reverse=")
 	color := flag.String("color", "default", "Format the output into a specified colour, either the entire text, or limited to specified characters.")
+	skipsFlagColor := CheckFlagSkipsEquals("--color=")
 	output := flag.String("output", "default", "Save the output to the specified filename")
+	skipsFlagOutput := CheckFlagSkipsEquals("--output=")
 	align := flag.String("align", "default", "Align the output to a specified alignment.")
+	skipsFlagAlign := CheckFlagSkipsEquals("--align=")
 	help := flag.Bool("help", false, "Provide the user with a help file.")
 	test := flag.Bool("test", false, "testing")
 	flag.Parse() // parse the flags so that they can be used
@@ -408,7 +410,7 @@ func main() {
 		var colorAll bool
 		var colSLice []rune
 		colorAll = true
-		if len(additionalArgs) > 2 {
+		if skipsFlagColor {
 			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> \"something\"")
 		}
 		if len(additionalArgs) == 2 {
@@ -421,8 +423,9 @@ func main() {
 		return
 	}
 	if *output != "default" {
-		if len(additionalArgs) > 2 {
+		if skipsFlagOutput {
 			fmt.Println("Usage: go run . [OPTION] [STRING] [STYLE]\n\nEX: go run . --output=<filename> \"something\" shadow.")
+			return
 		}
 		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
 		if err != nil {
@@ -432,27 +435,48 @@ func main() {
 		fmt.Printf("Output has been saved to %v\n", *output)
 		return
 	}
-	// TODO * error message
+	if *align == "left" {
+		if skipsFlagAlign {
+			fmt.Println("Usage: go run .  [OPTION] [STRING] [BANNER]\n\nExample: go run . --align=right  something  standard")
+			return
+		}
+		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
+	}
 	if *align == "right" {
+		if skipsFlagAlign {
+			fmt.Println("Usage: go run .  [OPTION] [STRING] [BANNER]\n\nExample: go run . --align=right  something  standard")
+			return
+		}
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 1))
 		return
 	}
 	if *align == "center" {
+		if skipsFlagAlign {
+			fmt.Println("Usage: go run .  [OPTION] [STRING] [BANNER]\n\nExample: go run . --align=right  something  standard")
+			return
+		}
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtAligned(input, getChars(PrepareBan(bannerStyle)), ds, ws, 2))
 		return
 	}
 	if *align == "justify" {
+		if skipsFlagAlign {
+			fmt.Println("Usage: go run .  [OPTION] [STRING] [BANNER]\n\nExample: go run . --align=right  something  standard")
+			return
+		}
 		ws := GetWinSize()
 		ds := GetArtWidth(input, getCharsWidth(PrepareBan(bannerStyle)))
 		fmt.Println(makeArtJustified(input, getChars(PrepareBan(bannerStyle)), ds, ws))
 		return
 	}
 	if *reverse != "default" {
-		// TODO * error message
+		if skipsFlagReverse {
+			fmt.Println("Usage: go run . [OPTION]\n\nEX: go run . --reverse=<fileName>")
+			return
+		}
 		file, err := os.Open(*reverse)
 		if err != nil {
 			log.Fatal(err)
@@ -460,22 +484,19 @@ func main() {
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
 		charMap := getInputChars(artToSingleLine(source), emptyCols)
-		AsciiToChars(charMap, getChars(PrepareBan("standard")), getChars(PrepareBan("shadow")), getChars(PrepareBan("thinkertoy")))
+		mapStandard := getChars(PrepareBan("standard"))
+		mapShadow := getChars(PrepareBan("shadow"))
+		mapThinkertoy := getChars(PrepareBan("thinkertoy"))
+		AsciiToChars(charMap, mapStandard, mapShadow, mapThinkertoy)
 	}
 	// test is for testing and debugging
 	if *test {
-		file, err := os.Open("newfile.txt")
-		if err != nil {
-			log.Fatal(err)
-		}
-		art := artToSingleLine(FileToVariable(file))
-		for _, line := range art {
-			fmt.Println(line)
-		}
+		fmt.Println("Reserved for testing and debugging.")
 	} else {
 		// default output
 		if len(additionalArgs) > 2 {
 			fmt.Println("Usage: go run . [STRING] [STYLE] (optional)\n\nEX: go run . \"something\" thinkertoy.\nAvailable styles are standard, shadow, and thinkertoy.")
+			return
 		}
 		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
 	}
