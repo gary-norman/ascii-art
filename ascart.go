@@ -109,6 +109,34 @@ func slicesEqual(slice1, slice2 []string) bool {
 }
 
 // artToSingleLine * TODO places each line of characters from FileToVariable on a single line
+func artToSingleLine(source []string) []string {
+	var output []string
+	if len(source) == 8 {
+		return source
+	}
+	for i := 0; i < 8; i++ {
+		output = append(output, source[i])
+	}
+	if len(source) > 8 {
+		source = source[8:]
+	}
+	x := 0
+	for len(source) > 0 {
+		for i := 0; i < 8; i++ {
+			output = append(output, output[i+x]+"** "+source[i])
+		}
+		x += 8
+		if len(source) > 8 {
+			source = source[8:]
+		} else {
+			source = nil
+		}
+	}
+	for len(output) > 8 {
+		output = output[8:]
+	}
+	return output
+}
 
 // getEmptyCols * get the index of the final space of each character in the reverse flag
 func getEmptyCols(source []string) []int {
@@ -149,7 +177,11 @@ func getInputChars(source []string, indices []int) map[int][]string {
 		}
 		startIndex = indices[id] + 1
 	}
+	for _, line := range source {
+		fmt.Println(line)
+	}
 	return charMap
+
 }
 
 // AsciiToChars * compares getChar and getInputChar and prints the string to the terminal
@@ -413,7 +445,14 @@ func main() {
 	}
 	// test is for testing and debugging
 	if *test {
-		fmt.Println(getChars(PrepareBan(bannerStyle)))
+		file, err := os.Open("newfile.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
+		art := artToSingleLine(FileToVariable(file))
+		for _, line := range art {
+			fmt.Println(line)
+		}
 	} else {
 		// default output
 		if len(additionalArgs) > 2 {
