@@ -14,7 +14,7 @@ e.g.
 
 Available styles are **standard**, **shadow**, and **thinkertoy**.
 > ![standard](./images/standard.png "standard")  
-> ![shadow](./images/shadow.png "shadow")
+> ![shadow](./images/shadow.png "shadow")  
 > ![thinkertoy](./images/thinkertoy.png "thinkertoy")
 
 ### Available flags:
