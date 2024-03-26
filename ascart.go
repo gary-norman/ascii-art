@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -46,17 +45,19 @@ func PrepareBan(bannerStyle string) []string {
 	style := bannerStyle
 	file, err := os.Open("ascii_styles/" + style + ".txt")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error opening the file:", err)
 	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println("Error closing the file:", err)
+		}
+	}(file)
 	scanned := bufio.NewScanner(file)
 	scanned.Split(bufio.ScanLines)
 	var source []string
 	for scanned.Scan() {
 		source = append(source, scanned.Text())
-	}
-	errClose := file.Close()
-	if errClose != nil {
-		return nil
 	}
 	return source
 }
@@ -68,10 +69,6 @@ func FileToVariable(file *os.File) []string {
 	var source []string
 	for scanned.Scan() {
 		source = append(source, scanned.Text())
-	}
-	errClose := file.Close()
-	if errClose != nil {
-		return nil
 	}
 	return source
 }
@@ -344,8 +341,12 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 		specifiedColor = "\033[33m"
 	case "blue":
 		specifiedColor = "\033[34m"
+	case "orange":
+		specifiedColor = "\033[38;5;208m"
 	default:
-		fmt.Print("\nAvailable colors are " + "\033[31m" + "red" + reset + ", " + "\033[32m" + "green" + reset + ", " + "\033[33m" + "yellow" + reset + ", and " + "\033[34m" + "blue" + reset + ".\n")
+		fmt.Print("\nAvailable colors are " + "\033[31m" + "red" + reset + ", " +
+			"\033[32m" + "green" + reset + "," + "\033[33m" + "yellow" + reset + ", " +
+			"\033[38;5;208m" + "orange" + reset + ", and " + "\033[34m" + "blue" + reset + ".\n")
 	}
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
@@ -433,7 +434,8 @@ func main() {
 		}
 		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error writing to the file:", err)
+			return // Exit the program on error
 		}
 		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
 		fmt.Printf("Output has been saved to %v\n", *output)
@@ -483,8 +485,15 @@ func main() {
 		}
 		file, err := os.Open(*reverse)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error opening the file:", err)
+			return // Exit the program on error
 		}
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				fmt.Println("Error closing the file:", err)
+			}
+		}(file)
 		source := FileToVariable(file)
 		emptyCols := removeValidSPaceIndex(getEmptyCols(source))
 		charMap := getInputChars(artToSingleLine(source), emptyCols)
@@ -492,10 +501,6 @@ func main() {
 		mapShadow := getChars(PrepareBan("shadow"))
 		mapThinkertoy := getChars(PrepareBan("thinkertoy"))
 		asciiToChars(charMap, mapStandard, mapShadow, mapThinkertoy)
-		errClose := file.Close()
-		if errClose != nil {
-			log.Fatal(err)
-		}
 	}
 	// test is for testing and debugging
 	if *test {
