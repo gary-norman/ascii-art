@@ -446,6 +446,7 @@ func main() {
 			return
 		}
 		fmt.Println(makeArt(input, getChars(PrepareBan(bannerStyle))))
+		return
 	}
 	if *align == "right" {
 		if skipsFlagAlign {
