@@ -324,6 +324,7 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 		}
 	}
 	art = strings.TrimRight(art, "\n")
+	art = strings.TrimRight(art, " ")
 	return art
 }
 
