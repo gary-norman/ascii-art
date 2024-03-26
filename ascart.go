@@ -195,7 +195,6 @@ func getInputChars(source []string, indices []int) map[int][]string {
 		startIndex = indices[id] + 1
 	}
 	return charMap
-
 }
 
 // Compares getChar and getInputChar and prints the string to the terminal
@@ -270,7 +269,7 @@ func getArtWidth(origString string, y map[int]int) []int {
 func makeArt(origString string, y map[int][]string) string {
 	var art string
 	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
-	wordSlice := strings.Split(replaceNewline, "\\n")               //split the input into slices
+	wordSlice := strings.Split(replaceNewline, "\\n")               // split the input into slices
 	for _, word := range wordSlice {                                // loop over the word to get the characters
 		for j := 0; j < len(y[32]); j++ { // loop over each vertical line of the word
 			var line string
@@ -429,10 +428,10 @@ func main() {
 	}
 	if *output != "default" {
 		if skipsFlagOutput {
-			fmt.Println("Usage: go run . [OPTION] [STRING] [STYLE]\n\nEX: go run . --output=<filename> \"something\" shadow.")
+			fmt.Println("Usage: go run . [OPTION] [STRING] [STYLE]\n\nEX: go run . --output=<filename> \"something\" standard")
 			return
 		}
-		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))), 0644)
+		err := os.WriteFile(*output, []byte(makeArt(input, getChars(PrepareBan(bannerStyle)))+"\n"), 0644)
 		if err != nil {
 			fmt.Println("Error writing to the file:", err)
 			return // Exit the program on error
