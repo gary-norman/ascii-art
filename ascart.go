@@ -319,12 +319,12 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 					line = line + strings.Repeat(" ", (int(ws.Col)-ds[i])/(sliceLen-1))
 				}
 			}
+			line = strings.TrimRight(line, " ")
 			art += line + "\n"
 			line = ""
 		}
 	}
 	art = strings.TrimRight(art, "\n")
-	art = strings.TrimRight(art, " ")
 	return art
 }
 
