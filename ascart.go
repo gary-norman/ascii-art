@@ -312,11 +312,24 @@ func makeArtJustified(origString string, y map[int][]string, ds []int, ws Winsiz
 	for i := 0; i < len(wordSlice); i++ {
 		for j := 0; j < len(y[32]); j++ {
 			var line string
+			spaces := 0
 			for _, letter := range wordSlice[i] {
-				line = line + y[int(letter)][j]
-				sliceLen := len(wordSlice[i])
-				if sliceLen >= 2 {
-					line = line + strings.Repeat(" ", (int(ws.Col)-ds[i])/(sliceLen-1))
+				if letter == 32 {
+					spaces += 1
+				}
+			}
+			for _, letter := range wordSlice[i] {
+				if spaces > 0 {
+					line = line + y[int(letter)][j]
+					if letter == 32 {
+						line = line + strings.Repeat(" ", (int(ws.Col)-ds[i])/spaces)
+					}
+				} else {
+					line = line + y[int(letter)][j]
+					sliceLen := len(wordSlice[i])
+					if sliceLen >= 2 {
+						line = line + strings.Repeat(" ", (int(ws.Col)-ds[i])/(sliceLen-1))
+					}
 				}
 			}
 			line = strings.TrimRight(line, " ")
