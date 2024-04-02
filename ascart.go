@@ -460,6 +460,7 @@ func main() {
 		colorAll = true
 		if skipsFlagColor {
 			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> \"something\"")
+			return
 		}
 		if len(additionalArgs) == 2 {
 			colorAll = false
