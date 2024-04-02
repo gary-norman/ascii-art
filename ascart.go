@@ -158,7 +158,7 @@ func getEmptyCols(source []string) []int {
 	return emptyCols
 }
 
-// Remove indices for valid spaces, before the end space
+// Remove indices for valid spaces, before the end space. Valid spaces are 6 characters wide.
 func removeValidSPaceIndex(indices []int) []int {
 	for i := 0; i < len(indices)-1; i++ {
 		if len(indices)-i > 6 {
@@ -348,13 +348,43 @@ func makeArtColorized(origString string, y map[int][]string, letters []rune, col
 	switch color {
 	case "red":
 		specifiedColor = "\033[31m"
+	case "#ff0000":
+		specifiedColor = "\033[31m"
+	case "rgb(255, 0, 0)":
+		specifiedColor = "\033[31m"
+	case "hsl(0, 100%, 50%)":
+		specifiedColor = "\033[31m"
 	case "green":
+		specifiedColor = "\033[32m"
+	case "#00ff00":
+		specifiedColor = "\033[32m"
+	case "rgb(0, 255, 0)":
+		specifiedColor = "\033[32m"
+	case "hsl(120, 100%, 50%)":
 		specifiedColor = "\033[32m"
 	case "yellow":
 		specifiedColor = "\033[33m"
+	case "#f0ff00":
+		specifiedColor = "\033[33m"
+	case "rgb(240, 255, 0)":
+		specifiedColor = "\033[33m"
+	case "hsl(64, 100%, 50%)":
+		specifiedColor = "\033[33m"
 	case "blue":
 		specifiedColor = "\033[34m"
+	case "#0000ff":
+		specifiedColor = "\033[34m"
+	case "rgb(0, 0, 255)":
+		specifiedColor = "\033[34m"
+	case "hsl(240, 100%, 50%)":
+		specifiedColor = "\033[34m"
 	case "orange":
+		specifiedColor = "\033[38;5;208m"
+	case "#f9690e":
+		specifiedColor = "\033[38;5;208m"
+	case "rgb(249, 105, 14)":
+		specifiedColor = "\033[38;5;208m"
+	case "hsl(23, 100%, 50%)":
 		specifiedColor = "\033[38;5;208m"
 	default:
 		fmt.Print("\nAvailable colors are " + "\033[31m" + "red" + reset + ", " +
