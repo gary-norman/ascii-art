@@ -158,22 +158,3 @@ func GetArtWidth(origString string, y map[int]int) []int {
 	}
 	return width
 }
-
-// MakeArt Transform the input text origString to the output art, line by line
-func MakeArt(origString string, y map[int][]string) string {
-	var art string
-	replaceNewline := strings.ReplaceAll(origString, "\r\n", "\\n") // correct newline formatting
-	wordSlice := strings.Split(replaceNewline, "\\n")               // split the input into slices
-	for _, word := range wordSlice {                                // loop over the word to get the characters
-		for j := 0; j < len(y[32]); j++ { // loop over each vertical line of the word
-			var line string
-			for _, letter := range word { // loop over each character
-				line = line + y[int(letter)][j] // add each line of the character to the line string
-			}
-			art += line + "\n" // add each line string (followed by a line break) to the final output
-			line = ""
-		}
-	}
-	art = strings.TrimRight(art, "\n") // remove the final line break
-	return art
-}

@@ -11,10 +11,8 @@ import (
 
 // Winsize is a struct that stores the height and width of the terminal.
 type Winsize struct {
-	Row    uint16
-	Col    uint16
-	Xpixel uint16 // unused
-	Ypixel uint16 // unused
+	Row uint16
+	Col uint16
 }
 
 // GetWinSize populates the Winsize structure

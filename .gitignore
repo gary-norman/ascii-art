@@ -1,0 +1,12 @@
+.gitignore
+go.mod
+go.sum
+test/
+/qodana.yaml
+ascii-art.iml
+filename.txt
+launch.json
+misc.xml
+modules.xml
+newfile.txt
+vcs.xml
